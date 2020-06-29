@@ -18,7 +18,7 @@ import tokenizer
 import torch
 from torch.utils.data import TensorDataset, DataLoader, RandomSampler, SequentialSampler
 
-#V1: Categories are General, Community, Project, and Device
+#V3: Categories are General, Project, App, and Other.
 
 #Walkthrough Link: https://towardsdatascience.com/bert-for-dummies-step-by-step-tutorial-fb90890ffe03
 
@@ -57,25 +57,25 @@ for num in range(100):
         url.append(link['content'])
 
 
-#generalcats =  ["Groups & Events", "General Discussion", "FAQ", "Deals", "Announcements"] #+OTHER, 0
-communitycats = ["Community Created Device Types", "Community Created SmartApps"] #1
-projectcats = ["Projects & Stories", "Apps & Clients", "Writing SmartApps", "SmartApps & Automations"] #2
-devicecats = ["Devices & Integrations", "Hub Firmware Beta", "Connected Things", "Writing Device Types"] #3
+generalcats =  ["Groups & Events", "General Discussion", "FAQ", "Deals", "Announcements", "How-To", "Features and Feedback"] #0
+projectcats = ["Projects & Stories", "Automation Ideas", "Devices & Integrations", 
+                "Hub Firmware Beta", "Connected Things", "Writing Device Types", "Community Created Device Types"] #1
+appcats = ["Mobile Tips & Tricks", "Apps & Clients", "Writing SmartApps", "SmartApps & Automations"
+            , "Connected Things", "Android", "SmartThings (Samsung Connect)", "webCoRE", "Community Created SmartApps"] #2
 
 #Assign each category to a number
 numcategories = 4
 for element in tags:
-    if(element in devicecats):
-        numtags.append(3)
-        #numtags.append([0, 0, 0, 1])
+    if(element in generalcats):
+        numtags.append(0)
     elif(element in projectcats):
+        numtags.append(1)
+        #numtags.append([0, 0, 0, 1])
+    elif(element in appcats):
         numtags.append(2)
         #numtags.append([0, 0, 1, 0])
-    elif(element in communitycats):
-        numtags.append(1)
-        #numtags.append([0, 1, 0, 0])
     else:
-        numtags.append(0)
+        numtags.append(3)
         #numtags.append([1, 0, 0, 0])
 
 print(numtags)
@@ -256,13 +256,13 @@ for number in flattened_actual:
         catlist.append("General")
         predlist.append("Real Count")
     elif(number == 1):
-        catlist.append("Community")
-        predlist.append("Real Count")
-    elif(number == 2):
         catlist.append("Project")
         predlist.append("Real Count")
+    elif(number == 2):
+        catlist.append("Apps")
+        predlist.append("Real Count")
     elif(number == 3):
-        catlist.append("Device")
+        catlist.append("Other")
         predlist.append("Real Count")
 
 
@@ -271,13 +271,13 @@ for number in flattened_predictions:
         catlist.append("General")
         predlist.append("Predicted")
     elif(number == 1):
-        catlist.append("Community")
-        predlist.append("Predicted")
-    elif(number == 2):
         catlist.append("Project")
         predlist.append("Predicted")
+    elif(number == 2):
+        catlist.append("Apps")
+        predlist.append("Predicted")
     elif(number == 3):
-        catlist.append("Device")
+        catlist.append("Other")
         predlist.append("Predicted")
 
 comparison["Topics"] = catlist

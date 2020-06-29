@@ -1,0 +1,10 @@
+First 100 pages (3000 articles) ran for each version. All use Sequence Classification.
+
+V1: Categories are General, Community, Project, and Device.
+697/3864 (18.04%) sentences guessed correctly.
+
+V2: Categories are the same as the article tags.
+190/3862 (4.92%) sentences guessed correctly.
+
+V3: Categories are General, Project, App, and Other.
+790/3862 (20.46%) sentences guessed correctly.

@@ -7,22 +7,23 @@ import numpy
 import inspect
 from keras.preprocessing.sequence import pad_sequences #Requires TensorFlow installation
 import pandas
+import seaborn
 from transformers import BertTokenizer, BertForSequenceClassification, BertConfig, BertModel, AdamW, get_linear_schedule_with_warmup
 import random
 import re
 import requests
-import seaborn
 from sklearn.metrics import f1_score
 from sklearn.model_selection import train_test_split
 import tokenizer
 import torch
 from torch.utils.data import TensorDataset, DataLoader, RandomSampler, SequentialSampler
 
-#V1: Categories are General, Community, Project, and Device
+#V2: Categories are the same as the article tags.
 
 #Walkthrough Link: https://towardsdatascience.com/bert-for-dummies-step-by-step-tutorial-fb90890ffe03
 
-articledict = defaultdict(int)
+categoriesdict = defaultdict(int)
+categories = []
 bertTokens = []
 bertIds = []
 tags = []
@@ -56,29 +57,23 @@ for num in range(100):
         #Add the URL to the list
         url.append(link['content'])
 
-
-#generalcats =  ["Groups & Events", "General Discussion", "FAQ", "Deals", "Announcements"] #+OTHER, 0
-communitycats = ["Community Created Device Types", "Community Created SmartApps"] #1
-projectcats = ["Projects & Stories", "Apps & Clients", "Writing SmartApps", "SmartApps & Automations"] #2
-devicecats = ["Devices & Integrations", "Hub Firmware Beta", "Connected Things", "Writing Device Types"] #3
-
-#Assign each category to a number
-numcategories = 4
+#Assign each topic to a number
+catnumber = 0
+firstcat = ""
 for element in tags:
-    if(element in devicecats):
-        numtags.append(3)
-        #numtags.append([0, 0, 0, 1])
-    elif(element in projectcats):
-        numtags.append(2)
-        #numtags.append([0, 0, 1, 0])
-    elif(element in communitycats):
-        numtags.append(1)
-        #numtags.append([0, 1, 0, 0])
-    else:
-        numtags.append(0)
-        #numtags.append([1, 0, 0, 0])
+    if(catnumber == 0):
+        firstcat = element
+        categoriesdict[element] = 0
+        categories.append(element)
+        catnumber += 1
+    elif(categoriesdict[element] == 0 and element != firstcat):
+        categoriesdict[element] = catnumber
+        categories.append(element)
+        catnumber += 1
+    
+    numtags.append(categoriesdict[element])
 
-print(numtags)
+numcategories = len(categoriesdict)
 
 completed = 0
 #Go to each topic page
@@ -246,39 +241,22 @@ for case in range(numcases):
 
 print("\n\nNUMCORRECT: " + str(numcorrect) + "/" + str(numcases) + " (" + str(round(100 * float(numcorrect)/float(numcases), 2)) + "%)")
 
+print(categoriesdict)
+
 comparison = pandas.DataFrame()
 
 catlist = []
 predlist = []
 
 for number in flattened_actual:
-    if(number == 0):
-        catlist.append("General")
-        predlist.append("Real Count")
-    elif(number == 1):
-        catlist.append("Community")
-        predlist.append("Real Count")
-    elif(number == 2):
-        catlist.append("Project")
-        predlist.append("Real Count")
-    elif(number == 3):
-        catlist.append("Device")
-        predlist.append("Real Count")
-
+    #catlist.append(categories[number])
+    catlist.append("C"+str(number))
+    predlist.append("Real Count")
 
 for number in flattened_predictions:
-    if(number == 0):
-        catlist.append("General")
-        predlist.append("Predicted")
-    elif(number == 1):
-        catlist.append("Community")
-        predlist.append("Predicted")
-    elif(number == 2):
-        catlist.append("Project")
-        predlist.append("Predicted")
-    elif(number == 3):
-        catlist.append("Device")
-        predlist.append("Predicted")
+    #catlist.append(categories[number])
+    catlist.append("C"+str(number))
+    predlist.append("Predicted")
 
 comparison["Topics"] = catlist
 comparison["Count"] = predlist
@@ -286,6 +264,5 @@ comparison["Count"] = predlist
 seaborn.countplot(x="Topics", hue="Count" ,data=comparison).set_title("RESULTS")
 
 matplotlib.pyplot.show()
-
 
 
