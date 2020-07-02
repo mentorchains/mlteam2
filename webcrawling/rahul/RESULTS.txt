@@ -8,3 +8,8 @@ V2: Categories are the same as the article tags.
 
 V3: Categories are General, Project, App, and Other.
 790/3862 (20.46%) sentences guessed correctly.
+
+V4: Home page categories
+99/450 articles guessed correctly. (22.0%)
+
+Tried running more tests, but the server keeps kicking me off!
